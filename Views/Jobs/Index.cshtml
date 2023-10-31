@@ -1,0 +1,133 @@
+﻿@using Job_Recruitment.ViewModels;
+@using System.Security.Claims;
+@using static Job_Recruitment.Helpers.Roles;
+
+@model UserVm;
+
+@{
+    ViewData["Title"] = "Index";
+}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<h1>Index</h1>
+
+<p>
+    @if (Model.Role == Role.Employer)
+    {
+        <a asp-action="Create">Create New Job</a>
+    }
+    @if (Model.Role == Role.Employee)
+    {
+        <form asp-action="BecomeEmployer" method="post">
+            <button class="btn btn-submit">Become an employer</button>
+        </form>
+    }
+</p>
+
+<label for="jobSearch">Search for a Job:</label>
+<select id="jobSearch" style="width: 200px;"></select>
+
+<table class="table" id="TestTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Location)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Salary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().PostDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().JobType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().IsActive)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Jobs)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Location)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PostDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Employer.FirstName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.JobType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsActive)
+                </td>
+                <td>
+                    @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == item.EmployerId)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit |</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete |</a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#jobSearch').select2({
+            placeholder: 'Start typing a job name...',
+            ajax: {
+                url: '/Jobs/SearchForJob',
+                dataType: 'json',
+                delay: 300, 
+                data: function (params) {
+                    return {
+                        searchTerm: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 3 
+        });
+
+        $('#jobSearch').on('select2:select', function (e) {
+            var data = e.params.data;
+            console.log('Job selected:', data);
+            window.location.href = '/Jobs/Details/' + data.id;
+        });
+    });
+</script>

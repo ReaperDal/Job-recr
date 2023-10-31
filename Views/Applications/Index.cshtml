@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Job_Recruitment.Models.Application>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h1>My applications</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Job)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateApplied)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Job.JobType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DateApplied)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<canvas id="applicationsChart" width="200" height="100"></canvas>
+
+
+<script>
+    $.ajax({
+        url: '/Applications/GetApplicationStatsForCurrentUser',
+        method: 'GET',
+        success: function (data) {
+            var ctx = document.getElementById('applicationsChart').getContext('2d');
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Accepted', 'Rejected', 'Pending'],
+                    datasets: [{
+                        label: 'Ratio',
+                        data: [data.accepted, data.rejected, data.pending],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 206, 86, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+    });
+
+</script>

@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Job_Recruitment.Models.Interview>
+
+<h2>My Scheduled Interviews</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date Scheduled</th>
+            <th>Interviewer</th>
+            <th>Job Title</th>
+            <th>Result</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var interview in Model)
+        {
+            <tr>
+                <td>@interview.DateScheduled.ToShortDateString()</td>
+                <td>@interview.InterviewerName</td>
+                <td>@interview.Application.Job.Title</td>
+                <td>@interview.Result</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@interview.Id">Edit Result</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

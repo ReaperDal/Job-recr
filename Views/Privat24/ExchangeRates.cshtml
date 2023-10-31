@@ -1,0 +1,30 @@
+﻿@model ExchangeRate
+
+<h2>Exchange Rates for @Model.Date</h2>
+<h4>Bank: @Model.Bank</h4>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Base Currency</th>
+            <th>Currency</th>
+            <th>Sale Rate (NB)</th>
+            <th>Purchase Rate (NB)</th>
+            <th>Sale Rate</th>
+            <th>Purchase Rate</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rate in Model.ExchangeRates)
+        {
+                <tr>
+                    <td>@rate.BaseCurrency</td>
+                    <td>@rate.Currency</td>
+                    <td>@rate.SaleRateNB</td>
+                    <td>@rate.PurchaseRateNB</td>
+                    <td>@rate.SaleRate</td>
+                    <td>@rate.PurchaseRate</td>
+                </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,119 @@
+﻿@using Job_Recruitment.ViewModels;
+@using System.Security.Claims;
+@model DetailVm
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Job</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.Title)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.Location)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.Location)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.Salary)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.Salary)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.PostDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.PostDate)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.User.FirstName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.User.LastName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.JobType)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.JobType)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Job.IsActive)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Job.IsActive)
+        </dd>
+    </dl>
+</div>
+@if (User.FindFirstValue(ClaimTypes.NameIdentifier) == Model.Job.EmployerId)
+{
+    <h3>Applications for this job:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Candidate Name</th>
+                <th>Date Applied</th>
+                <th>Status</th>
+                <th>Interview Result</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var application in Model.Applications)
+            {
+                <tr>
+                    <td>@Model.CandidateNames[application.CandidateId]</td>
+                    <td>@application.DateApplied.ToShortDateString()</td>
+                    <td>@application.Status</td>
+                    <td>
+                        @if (application.IsActive)
+                        {
+                            <form asp-controller="Applications" asp-action="UpdateApplication" method="post" style="display: inline;">
+                                <input type="hidden" name="applicationId" value="@application.Id" />
+                                <select name="newStatus" value="@application.Status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Accepted">Accepted</option>
+                                    <option value="Rejected">Rejected</option>
+                                   
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-success">Update Status</button>
+                                <button type="submit" name="action" value="deactivate" class="btn btn-sm btn-warning">Deactivate</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span>Inactive</span>
+                        }
+                    </td>
+                </tr>
+            }
+
+
+        </tbody>
+
+    </table>
+}
+else if (User.IsInRole("Employee"))
+{
+    <form asp-controller="Applications" asp-action="Create" asp-route-id="@Model?.Job.Id" method="post">
+        <button class="btn btn-primary">Apply for a job</button>
+    </form>
+}
+<a asp-action="Index"> | Back to List</a>
